@@ -83,21 +83,58 @@ export function getType()
 	return null;
 }
 
-export function createContainer()
+export function destroy(e){
+	if(this.options.cursor && e.target.style.cursor === 'progress')
+	{
+		e.target.style.cursor = this.data.cursor ? this.data.cursor : '';
+		this.data.cursor = null;
+	}
+
+	var container = document.querySelector('.preview-container');
+
+	if(container)
+	{
+		container.remove();
+	}
+
+	clearTimeout(this.timers.delay);
+	clearInterval(this.timers.load);
+
+	this.loaded = false;
+}
+
+export function createContainer(options)
 {
 	var container = document.createElement('div');
+	container.addEventListener('click', function (e) {
+		e.preventDefault();
+		e.stopPropagation();
+		destroy.apply(options.hoverPreview, [e]);
+	});
+	container.addEventListener('touchend', function (e) {
+		e.preventDefault();
+		e.stopPropagation();
+		destroy.apply(options.hoverPreview, [e]);
+	});
 
 	container.className = 'preview-container';
 
 	var styles = {
-		'pointer-events' : 'none',
+		'display': options.touch ? 'flex' : 'inherit',
+		'flex-direction': 'row',
+		'align-content': 'center',
+		'justify-content': 'center',
+		'pointer-events' : options.touch ? 'inherit': 'none',
 		'position' : 'fixed',
 		'visibility' : 'hidden',
 		'z-index' : '9999',
-		'top' : '-9999px',
-		'left' : '-9999px',
+		'top' : options.touch ? '0px' : '-9999px',
+		'left' : options.touch ? '0px' : '-9999px',
+		'width': options.touch ? '100vw' : 'inherit',
 		'max-width' : '100vw',
-		'max-height' : 'calc(100vh - 20px)'
+		'background-color': options.touch ? 'rgba(0,0,0, 0.8)' : 'inherit',
+		'height': options.touch ? '100vh' : 'inherit',
+		'max-height' : options.touch ? 'unset' : 'calc(100vh - 20px)'
 	};
 
 	Object.keys(styles).forEach((key) =>
@@ -119,6 +156,7 @@ export function loadImage(src, callback)
 
 	img.style['max-width'] = 'inherit';
 	img.style['max-height'] = 'inherit';
+	img.style['object-fit'] = 'contain';
 
 	img.src = encodeUrl.call(_this, src);
 
@@ -154,3 +192,4 @@ export function loadVideo(src, callback)
 		callback(video, [this.videoWidth, this.videoHeight]);
 	}; 
 }
+

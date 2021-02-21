@@ -44,6 +44,7 @@ class hoverPreview
 		this.handle.removeEventListener('mouseenter', events.mouseenter, false);
 		this.handle.removeEventListener('mouseleave', events.mouseleave, false);
 		this.handle.removeEventListener('mousemove', events.mousemove, false);
+		this.handle.removeEventListener('touchend', events.mouseenter, false);
 	}
 }
 
@@ -82,8 +83,7 @@ function setup()
 	this.handle.addEventListener('mouseenter', this.events.mouseenter, false);
 	this.handle.addEventListener('mouseleave', this.events.mouseleave, false);
 	this.handle.addEventListener('mousemove', this.events.mousemove, false);
+	this.handle.addEventListener("touchend", this.events.mouseenter, false);
 }
-const eve = new Event('hover-preview-ready', {bubbles: true});
-document.body.dispatchEvent(eve);
 // export default
 export default (element, options) => new hoverPreview(element, options)

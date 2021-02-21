@@ -4,7 +4,8 @@ import {
 	loadImage,
 	loadVideo,
 	createContainer,
-	getType
+	getType,
+	destroy
 } from './utils';
 
 function setOffset(e)
@@ -18,6 +19,8 @@ function setOffset(e)
 function onEnter(e)
 {
 	var target = e.target;
+	var touch = (e.sourceCapabilities && e.sourceCapabilities.firesTouchEvents) || e.type === 'touchend';
+	this._touch = touch;
 
 	// get source
 	if(Object.prototype.hasOwnProperty.call(this.options, 'source') && this.options.source)
@@ -53,7 +56,12 @@ function onEnter(e)
 		this.data.left = this.data.offset.x <= (window.innerWidth / 2);
 
 		// create preview container
-		var container = document.body.appendChild(createContainer());
+		var container;
+		if(document.body.firstChild){
+			container = document.body.insertBefore(createContainer({touch, hoverPreview: _this}), document.body.firstChild);
+		}else {
+			container = document.body.appendChild(createContainer({touch, hoverPreview: _this}));
+		}
 
 		// change cursor style if option is set
 		if(this.options.cursor && this.data.cursor === null)
@@ -79,7 +87,9 @@ function onEnter(e)
 
 				_this.loaded = true;
 
-				update.call(_this);
+				if(!touch){
+					update.call(_this);
+				}
 
 				container.style['visibility'] = 'visible';
 
@@ -135,24 +145,10 @@ export function mouseenter(e)
 	}
 }
 
+
+
 // destroy preview container
 export function mouseleave(e)
 {
-	if(this.options.cursor && e.target.style.cursor === 'progress')
-	{
-		e.target.style.cursor = this.data.cursor ? this.data.cursor : '';
-		this.data.cursor = null;
-	}
-
-	var container = document.querySelector('.preview-container');
-
-	if(container)
-	{
-		container.remove();
-	}
-
-	clearTimeout(this.timers.delay);
-	clearInterval(this.timers.load);
-
-	this.loaded = false;
+	destroy.call(this, e);
 }

@@ -82,9 +82,8 @@ function setup()
 	this.handle.addEventListener('mouseenter', this.events.mouseenter, false);
 	this.handle.addEventListener('mouseleave', this.events.mouseleave, false);
 	this.handle.addEventListener('mousemove', this.events.mousemove, false);
-	const eve = new Event('hove-preview-ready', {bubbles: true});
-	document.body.dispatchEvent(eve);
 }
-
+const eve = new Event('hover-preview-ready', {bubbles: true});
+document.body.dispatchEvent(eve);
 // export default
 export default (element, options) => new hoverPreview(element, options)
